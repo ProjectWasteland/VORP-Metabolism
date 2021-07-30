@@ -34,8 +34,7 @@ namespace vorpmetabolism_sv
                 int index = i;
                 TriggerEvent("vorpCore:registerUsableItem", LoadConfig.Config["ItemsToUse"][i]["Name"].ToString(), new Action<dynamic>((data) =>
                 {
-                    PlayerList pl = new PlayerList();
-                    Player p = pl[data.source];
+                    Player p = Players[data.source];
                     string itemLabel = data.item.label;
                     p.TriggerEvent("vorpmetabolism:useItem", index, itemLabel);
                     TriggerEvent("vorpCore:subItem", data.source, LoadConfig.Config["ItemsToUse"][index]["Name"].ToString(), 1);
