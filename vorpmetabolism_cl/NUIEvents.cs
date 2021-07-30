@@ -23,6 +23,7 @@ namespace vorpmetabolism_cl
             msgNUI.Add("food", hunger);
 
             API.SendNuiMessage(msgNUI.ToString());
+            TriggerEvent("joew-at:changeMetabolisms", vorpmetabolism_init.pStatus["Thirst"].ToObject<int>(), vorpmetabolism_init.pStatus["Hunger"].ToObject<int>());
         }
 
         public static async Task ShowHUD(bool show)

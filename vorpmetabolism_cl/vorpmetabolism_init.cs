@@ -258,18 +258,7 @@ namespace vorpmetabolism_cl
 
         public uint ConvertValue(string s)
         {
-            uint result;
-
-            if (uint.TryParse(s, out result))
-            {
-                return result;
-            }
-            else
-            {
-                int interesante = int.Parse(s);
-                result = (uint)interesante;
-                return result;
-            }
+            return uint.TryParse(s, out var result) ? result : (uint)int.Parse(s);
         }
     }
 }
