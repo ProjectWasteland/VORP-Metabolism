@@ -1,9 +1,9 @@
-﻿using CitizenFX.Core;
-using CitizenFX.Core.Native;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using CitizenFX.Core;
+using CitizenFX.Core.Native;
+using Newtonsoft.Json.Linq;
 
 namespace vorpmetabolism_cl
 {
@@ -12,17 +12,17 @@ namespace vorpmetabolism_cl
         public static JObject Config = new JObject();
         public static Dictionary<string, string> Langs = new Dictionary<string, string>();
 
-        public static bool configLoaded = false;
+        public static bool configLoaded;
 
         public GetConfig()
         {
-            EventHandlers[$"{API.GetCurrentResourceName()}:SendConfig"] += new Action<string, ExpandoObject>(LoadDefaultConfig);
+            EventHandlers[$"{API.GetCurrentResourceName()}:SendConfig"] +=
+                    new Action<string, ExpandoObject>(LoadDefaultConfig);
             TriggerServerEvent($"{API.GetCurrentResourceName()}:getConfig");
         }
 
         private void LoadDefaultConfig(string dc, ExpandoObject dl)
         {
-
             Config = JObject.Parse(dc);
 
             foreach (var l in dl)

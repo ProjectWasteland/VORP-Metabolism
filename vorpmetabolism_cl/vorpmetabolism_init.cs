@@ -1,25 +1,23 @@
-﻿using CitizenFX.Core;
+﻿using System;
+using System.Threading.Tasks;
+using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace vorpmetabolism_cl
 {
     public class vorpmetabolism_init : BaseScript
     {
         public static JObject pStatus = new JObject();
-        public static bool loaded = false;
+        public static bool loaded;
         public static bool metabolismActive = false;
 
         public vorpmetabolism_init()
         {
             EventHandlers["vorpmetabolism:StartFunctions"] += new Action<string>(StartFunctions);
             EventHandlers["vorp:PlayerForceRespawn"] += new Action(ForceRespawn);
-            EventHandlers["vorp:SelectedCharacter"] += new Action<int>((charId) => { TriggerServerEvent("vorpmetabolism:GetStatus"); });
+            EventHandlers["vorp:SelectedCharacter"] +=
+                    new Action<int>(charId => { TriggerServerEvent("vorpmetabolism:GetStatus"); });
         }
 
         private void ForceRespawn()
@@ -50,16 +48,19 @@ namespace vorpmetabolism_cl
                 Tick += RadarControlHud;
                 Tick += MetabolismSet;
             }
+
             loaded = true;
         }
 
-        
         private async Task MetabolismSet()
         {
-            if (!loaded || !metabolismActive) { return; }
+            if (!loaded || !metabolismActive)
+            {
+                return;
+            }
 
             await Delay(10000);
-            int pPedID = API.PlayerPedId();
+            var pPedID = API.PlayerPedId();
             switch (pStatus["Metabolism"].ToObject<int>() / 1000)
             {
                 case 10:
@@ -147,22 +148,27 @@ namespace vorpmetabolism_cl
                     SaveNewMetabolism((uint)WaistUtils.WAIST_TYPES[0]);
                     break;
             }
+
             Function.Call((Hash)0xCC8CA3E88256E58F, pPedID, 0, 1, 1, 1, false);
             await Delay(300000);
         }
-        
+
         public static void SaveNewMetabolism(uint waist)
         {
             //Next Features
         }
 
-        
         private async Task RadarControlHud()
         {
-            if (!loaded) { return; }
+            if (!loaded)
+            {
+                return;
+            }
+
             await Delay(1000);
 
-            if ((API.IsRadarHidden()) || (API.IsPauseMenuActive()) || (!ApiCalls.APIShowOn) || (API.NetworkIsInSpectatorMode()) || (API.IsHudHidden()))
+            if (API.IsRadarHidden() || API.IsPauseMenuActive() || !ApiCalls.APIShowOn ||
+                API.NetworkIsInSpectatorMode() || API.IsHudHidden())
             {
                 NUIEvents.ShowHUD(false);
             }
@@ -170,42 +176,51 @@ namespace vorpmetabolism_cl
             {
                 NUIEvents.ShowHUD(true);
             }
-
         }
 
-        
         private async Task MetabolismSaveDB()
         {
-            if (!loaded) { return; }
-            await Delay(60000); 
-            TriggerServerEvent("vorpmetabolism:SaveLastStatus", pStatus.ToString());
+            if (!loaded)
+            {
+                return;
+            }
 
+            await Delay(60000);
+            TriggerServerEvent("vorpmetabolism:SaveLastStatus", pStatus.ToString());
         }
 
-        
         private async Task MetabolismUpdaters()
         {
-            if (!loaded || !GetConfig.configLoaded) { return; }
+            if (!loaded || !GetConfig.configLoaded)
+            {
+                return;
+            }
 
             await Delay(GetConfig.Config["EveryTimeStatusDown"].ToObject<int>());
 
-            if (pStatus["Thirst"].ToObject<int>() > 0 && pStatus["Hunger"].ToObject<int>() > 0 && !API.IsPlayerDead(API.PlayerId()))
+            if (pStatus["Thirst"].ToObject<int>() > 0 && pStatus["Hunger"].ToObject<int>() > 0 &&
+                !API.IsPlayerDead(API.PlayerId()))
             {
                 if (API.IsPedRunning(API.PlayerPedId()))
                 {
-                    pStatus["Thirst"] = pStatus["Thirst"].ToObject<int>() - GetConfig.Config["HowAmountThirstWhileRunning"].ToObject<int>();
-                    pStatus["Hunger"] = pStatus["Hunger"].ToObject<int>() - GetConfig.Config["HowAmountHungerWhileRunning"].ToObject<int>();
+                    pStatus["Thirst"] = pStatus["Thirst"].ToObject<int>() -
+                                        GetConfig.Config["HowAmountThirstWhileRunning"].ToObject<int>();
+                    pStatus["Hunger"] = pStatus["Hunger"].ToObject<int>() -
+                                        GetConfig.Config["HowAmountHungerWhileRunning"].ToObject<int>();
                 }
                 else
                 {
-                    pStatus["Thirst"] = pStatus["Thirst"].ToObject<int>() - GetConfig.Config["HowAmountThirst"].ToObject<int>();
-                    pStatus["Hunger"] = pStatus["Hunger"].ToObject<int>() - GetConfig.Config["HowAmountHunger"].ToObject<int>();
+                    pStatus["Thirst"] = pStatus["Thirst"].ToObject<int>() -
+                                        GetConfig.Config["HowAmountThirst"].ToObject<int>();
+                    pStatus["Hunger"] = pStatus["Hunger"].ToObject<int>() -
+                                        GetConfig.Config["HowAmountHunger"].ToObject<int>();
                 }
 
                 if (pStatus["Thirst"].ToObject<int>() < 0)
                 {
                     pStatus["Thirst"] = 0;
                 }
+
                 if (pStatus["Thirst"].ToObject<int>() < 0)
                 {
                     pStatus["Hunger"] = 0;
@@ -216,40 +231,45 @@ namespace vorpmetabolism_cl
             {
                 if (API.IsPedRunning(API.PlayerPedId()))
                 {
-                    pStatus["Metabolism"] = pStatus["Metabolism"].ToObject<int>() - GetConfig.Config["HowAmountMetabolismWhileRunning"].ToObject<int>();
+                    pStatus["Metabolism"] = pStatus["Metabolism"].ToObject<int>() -
+                                            GetConfig.Config["HowAmountMetabolismWhileRunning"].ToObject<int>();
                 }
                 else
                 {
-                    pStatus["Metabolism"] = pStatus["Metabolism"].ToObject<int>() - GetConfig.Config["HowAmountMetabolism"].ToObject<int>();
+                    pStatus["Metabolism"] = pStatus["Metabolism"].ToObject<int>() -
+                                            GetConfig.Config["HowAmountMetabolism"].ToObject<int>();
                 }
-                   
             }
-
         }
 
-        
         private async Task MetabolismTimers()
         {
-            if (!loaded) { return; }
+            if (!loaded)
+            {
+                return;
+            }
 
             await Delay(3000);
 
             if (pStatus["Thirst"].ToObject<int>() <= 0 && !API.IsPlayerDead(API.PlayerId()))
             {
-                int newHealth = API.GetEntityHealth(API.PlayerPedId()) - 20;
+                var newHealth = API.GetEntityHealth(API.PlayerPedId()) - 20;
                 if (newHealth < 1)
                 {
                     Function.Call((Hash)0x697157CED63F18D4, API.PlayerPedId(), 500000, false, true, true);
                 }
+
                 API.SetEntityHealth(API.PlayerPedId(), newHealth, 0);
             }
+
             if (pStatus["Hunger"].ToObject<int>() <= 0 && !API.IsPlayerDead(API.PlayerId()))
             {
-                int newHealth = API.GetEntityHealth(API.PlayerPedId()) - 20;
+                var newHealth = API.GetEntityHealth(API.PlayerPedId()) - 20;
                 if (newHealth < 1)
                 {
                     Function.Call((Hash)0x697157CED63F18D4, API.PlayerPedId(), 500000, false, true, true);
                 }
+
                 API.SetEntityHealth(API.PlayerPedId(), newHealth, 0);
             }
 

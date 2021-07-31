@@ -1,15 +1,10 @@
-﻿using CitizenFX.Core;
-using CitizenFX.Core.Native;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CitizenFX.Core;
 
 namespace vorpmetabolism_cl
 {
-    class ApiCalls : BaseScript
+    internal class ApiCalls : BaseScript
     {
         #region Properties
 
@@ -40,7 +35,7 @@ namespace vorpmetabolism_cl
 
         private void getValue(string key, dynamic cb)
         {
-            string newKey = key.First().ToString().ToUpper() + key.Substring(1); //Fixed first char to upper case
+            var newKey = key.First().ToString().ToUpper() + key.Substring(1); //Fixed first char to upper case
 
             if (vorpmetabolism_init.pStatus.ContainsKey(newKey))
             {
@@ -50,15 +45,14 @@ namespace vorpmetabolism_cl
             {
                 cb.Invoke(null);
             }
-
         }
 
         private void changeValue(string key, int value)
         {
-            string newKey = key.First().ToString().ToUpper() + key.Substring(1); //Fixed first char to upper case
+            var newKey = key.First().ToString().ToUpper() + key.Substring(1); //Fixed first char to upper case
             if (vorpmetabolism_init.pStatus.ContainsKey(newKey))
             {
-                int newValue = vorpmetabolism_init.pStatus[newKey].ToObject<int>() + value;
+                var newValue = vorpmetabolism_init.pStatus[newKey].ToObject<int>() + value;
                 if (newKey.Equals("Metabolism"))
                 {
                     if (newValue > 10000)
@@ -83,13 +77,12 @@ namespace vorpmetabolism_cl
                 }
 
                 vorpmetabolism_init.pStatus[newKey] = newValue;
-
             }
         }
 
         private void setValue(string key, int value)
         {
-            string newKey = key.First().ToString().ToUpper() + key.Substring(1); //Fixed first char to upper case
+            var newKey = key.First().ToString().ToUpper() + key.Substring(1); //Fixed first char to upper case
             if (!vorpmetabolism_init.pStatus.ContainsKey(newKey))
             {
                 return;
@@ -132,7 +125,7 @@ namespace vorpmetabolism_cl
             {
                 food = 0;
             }
-            
+
             if (water > 1000)
             {
                 water = 1000;

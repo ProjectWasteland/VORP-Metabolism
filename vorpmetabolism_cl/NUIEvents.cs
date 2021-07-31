@@ -1,34 +1,31 @@
-﻿using CitizenFX.Core;
+﻿using System.Threading.Tasks;
+using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace vorpmetabolism_cl
 {
-    class NUIEvents : BaseScript
+    internal class NUIEvents : BaseScript
     {
         public static async Task UpdateHUD()
         {
-            JObject msgNUI = new JObject();
+            var msgNUI = new JObject();
 
-            double thirst = vorpmetabolism_init.pStatus["Thirst"].ToObject<double>() / 1000;
-            double hunger = vorpmetabolism_init.pStatus["Hunger"].ToObject<double>() / 1000;
+            var thirst = vorpmetabolism_init.pStatus["Thirst"].ToObject<double>() / 1000;
+            var hunger = vorpmetabolism_init.pStatus["Hunger"].ToObject<double>() / 1000;
 
             msgNUI.Add("action", "update");
             msgNUI.Add("water", thirst);
             msgNUI.Add("food", hunger);
 
             API.SendNuiMessage(msgNUI.ToString());
-            TriggerEvent("joew-at:changeMetabolisms", vorpmetabolism_init.pStatus["Thirst"].ToObject<int>(), vorpmetabolism_init.pStatus["Hunger"].ToObject<int>());
+            TriggerEvent("joew-at:changeMetabolisms", vorpmetabolism_init.pStatus["Thirst"].ToObject<int>(),
+                         vorpmetabolism_init.pStatus["Hunger"].ToObject<int>());
         }
 
         public static async Task ShowHUD(bool show)
         {
-            JObject msgNUI = new JObject();
+            var msgNUI = new JObject();
             if (show)
             {
                 msgNUI.Add("action", "show");

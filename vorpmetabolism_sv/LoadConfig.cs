@@ -1,13 +1,11 @@
-﻿using CitizenFX.Core;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using CitizenFX.Core;
 using CitizenFX.Core.Native;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace vorpmetabolism_sv
 {
@@ -33,7 +31,7 @@ namespace vorpmetabolism_sv
                 Config = JObject.Parse(ConfigString);
                 if (File.Exists($"{resourcePath}/{Config["defaultlang"]}.json"))
                 {
-                    string langstring = File.ReadAllText($"{resourcePath}/{Config["defaultlang"]}.json", Encoding.UTF8);
+                    var langstring = File.ReadAllText($"{resourcePath}/{Config["defaultlang"]}.json", Encoding.UTF8);
                     Langs = JsonConvert.DeserializeObject<Dictionary<string, string>>(langstring);
                     Debug.WriteLine($"{API.GetCurrentResourceName()}: Language {Config["defaultlang"]}.json loaded!");
                 }
@@ -48,7 +46,7 @@ namespace vorpmetabolism_sv
             }
         }
 
-        private void getConfig([FromSource]Player source)
+        private void getConfig([FromSource] Player source)
         {
             source.TriggerEvent($"{API.GetCurrentResourceName()}:SendConfig", ConfigString, Langs);
         }
